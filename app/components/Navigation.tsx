@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
-export default function Navigation({ categories = [] }) {
+export default function Navigation({ categories = [] }: any) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);

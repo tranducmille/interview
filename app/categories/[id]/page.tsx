@@ -13,7 +13,7 @@ export default function CategoryDetailPage() {
   const { data: session, status } = useSession();
   const params = useParams();
   const router = useRouter();
-  const [category, setCategory] = useState(null);
+  const [category, setCategory] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
@@ -130,7 +130,7 @@ export default function CategoryDetailPage() {
 
         <div className="space-y-4">
           {category?.questions?.length > 0 ? (
-            category.questions.map((question, index) => (
+            category.questions.map((question: any, index: any) => (
               <QuestionAccordion
                 key={question.id}
                 question={question}

@@ -6,9 +6,9 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 import CategoryForm from "./CategoryForm";
 import toast from "react-hot-toast";
 
-export default function CategoryList({ initialCategories = [] }) {
+export default function CategoryList({ initialCategories = [] } : any) {
   const [categories, setCategories] = useState(initialCategories);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategory, setEditingCategory] =  useState<any>([]);
   const [showForm, setShowForm] = useState(false);
 
   const handleRefresh = async () => {
