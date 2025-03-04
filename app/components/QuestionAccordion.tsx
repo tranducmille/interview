@@ -18,11 +18,11 @@ export default function QuestionAccordion({
   };
 
   // Function to render the answer with code highlighting
-  const renderAnswer = (answer) => {
+  const renderAnswer = (answer: any) => {
     // Split by code blocks
     const parts = answer.split(/(```[a-z]*\n[\s\S]*?\n```)/g);
     
-    return parts.map((part, index) => {
+    return parts.map((part: any, index: any) => {
       // Check if this part is a code block
       const codeMatch = part.match(/```([a-z]*)\n([\s\S]*?)\n```/);
       
@@ -35,7 +35,7 @@ export default function QuestionAccordion({
       // Regular text - we'll parse it for inline code
       return (
         <div key={index} className="mb-2 whitespace-pre-wrap  text-xs">
-          {part.split(/(`.+?`)/g).map((text, i) => {
+          {part.split(/(`.+?`)/g).map((text: any, i: any) => {
             if (text.startsWith("`") && text.endsWith("`")) {
               // Inline code
               return (

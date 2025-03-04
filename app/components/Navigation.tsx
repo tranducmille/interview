@@ -44,7 +44,7 @@ export default function Navigation({ categories = [] }: any) {
             >
               All Categories
             </Link>
-            {categories.map((category) => (
+            {categories.map((category: any) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.id}`}

@@ -40,7 +40,7 @@ export default function CategoryList({ initialCategories = [] } : any) {
 
       if (res.ok) {
         toast.success("Category deleted successfully");
-        setCategories(categories.filter((cat) => cat.id !== id));
+        setCategories(categories.filter((cat: any) => cat.id !== id));
       } else {
         const error = await res.json();
         toast.error(error.message || "Failed to delete category");
@@ -85,7 +85,7 @@ export default function CategoryList({ initialCategories = [] } : any) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {categories.length > 0 ? (
-          categories.map((category) => (
+          categories.map((category: any) => (
             <div
               key={category.id}
               className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
