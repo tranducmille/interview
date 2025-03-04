@@ -22,3 +22,22 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.btn-small {
+  padding: 0.25rem 0.5rem; /* Smaller padding */
+  font-size: 0.75rem; /* Smaller font size */
+  border: 1px solid #d1d5db; /* Lighter border color */
+  transition: border-color 0.3s; /* Smooth transition for hover effect */
+  cursor: pointer;
+}
+
+.btn-small:hover {
+  border-color: #9ca3af; /* Change border color on hover */
+  color: var(--foreground);
+}
+
+.code-block {
+  pre {
+    font-size: small !important;
+  }
+}
