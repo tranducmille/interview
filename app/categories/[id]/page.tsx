@@ -44,12 +44,12 @@ export default function CategoryDetailPage() {
     }
   };
 
-  const handleQuestionEdit = (question) => {
+  const handleQuestionEdit = (question: any) => {
     setEditingQuestion(question);
     setShowForm(true);
   };
 
-  const handleQuestionDelete = async (questionId) => {
+  const handleQuestionDelete = async (questionId: any) => {
     if (!window.confirm("Are you sure you want to delete this question?")) {
       return;
     }

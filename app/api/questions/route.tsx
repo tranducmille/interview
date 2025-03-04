@@ -5,7 +5,7 @@ import { authOptions } from '../../lib/auth';
 const prisma = new PrismaClient();
 
 // Create a new question
-export async function POST(request) {
+export async function POST(request: any) {
   try {
     const session = await getServerSession(authOptions);
     

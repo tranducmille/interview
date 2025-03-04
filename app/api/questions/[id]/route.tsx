@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { authOptions } from '../../../lib/auth';
 const prisma = new PrismaClient();
 // Get a specific question
-export async function GET(request, { params }) {
+export async function GET(request: any, { params }: any) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -56,7 +56,7 @@ export async function GET(request, { params }) {
 }
 
 // Update a question
-export async function PUT(request, { params }) {
+export async function PUT(request: any, { params }: any) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -152,7 +152,7 @@ export async function PUT(request, { params }) {
 }
 
 // Delete a question
-export async function DELETE(request, { params }) {
+export async function DELETE(request: any, { params }: any) {
   try {
     const session = await getServerSession(authOptions);
     

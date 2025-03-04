@@ -10,7 +10,7 @@ export const metadata = {
   description: "Manage your Interview categories and questions",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: any) {
   return (
     <html lang="en">
       <body className={inter.className}>

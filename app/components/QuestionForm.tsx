@@ -8,7 +8,7 @@ export default function QuestionForm({
   onSuccess,
   initialData = null,
   onCancel,
-}) {
+}: any) {
   const [formData, setFormData] = useState({
     title: "",
     answer: "",

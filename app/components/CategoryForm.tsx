@@ -7,7 +7,7 @@ export default function CategoryForm({
   onSuccess,
   initialData = null,
   onCancel,
-}) {
+}: any) {
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -17,7 +17,7 @@ export default function CategoryForm({
     }
   }, [initialData]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsSubmitting(true);
 

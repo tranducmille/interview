@@ -23,12 +23,12 @@ export default function CategoryList({ initialCategories = [] }) {
     }
   };
 
-  const handleEdit = (category) => {
+  const handleEdit = (category: any) => {
     setEditingCategory(category);
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: any) => {
     if (!window.confirm("Are you sure you want to delete this category? This will also delete all questions within this category.")) {
       return;
     }

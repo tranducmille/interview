@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navigation from "./Navigation";
 
-export default function Layout({ children }) {
+export default function Layout({ children }: any) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [categories, setCategories] = useState([]);

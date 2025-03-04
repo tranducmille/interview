@@ -50,7 +50,7 @@ export async function GET(
   }
 }
 // Update a category
-export async function PUT(request, { params }) {
+export async function PUT(request: any, { params }: any) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -107,7 +107,7 @@ export async function PUT(request, { params }) {
 }
 
 // Delete a category
-export async function DELETE(request, { params }) {
+export async function DELETE(request: any, { params }: any) {
   try {
     const session = await getServerSession(authOptions);
     

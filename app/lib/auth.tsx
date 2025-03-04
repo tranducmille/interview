@@ -14,7 +14,7 @@ export const authOptions = {
     signIn: "/",
   },
   callbacks: {
-    session: async ({ session, user }) => {
+    session: async ({ session, user }: any) => {
       if (session?.user) {
         session.user.id = user.id;
       }

@@ -10,7 +10,7 @@ export default function QuestionAccordion({
   onDelete,
   isAdmin = false,
   index,
-}) {
+}: any) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleAccordion = () => {
