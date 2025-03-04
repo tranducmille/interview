@@ -20,10 +20,10 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
-          FAQ Management System
+        Interview Management System
         </h1>
         <div className="mb-4 text-center text-gray-600">
-          <p>Sign in to manage your FAQ categories and questions</p>
+          <p>Sign in to manage your Q&A categories and questions</p>
         </div>
         <button
           onClick={() => signIn("google", { callbackUrl: "/categories" })}
