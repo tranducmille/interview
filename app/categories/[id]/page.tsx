@@ -6,8 +6,9 @@ import { useParams, useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
 import QuestionAccordion from "../../components/QuestionAccordion";
 import QuestionForm from "../../components/QuestionForm";
+import AnswerContent from "../../components/AnswerContent";
 import toast from "react-hot-toast";
-import { FiPlus, FiX } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiPlus, FiX } from "react-icons/fi";
 
 export default function CategoryDetailPage() {
   const { data: session, status } = useSession();
@@ -17,6 +18,9 @@ export default function CategoryDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
 
   useEffect(() => {
     if (status === "authenticated" && params.id) {
@@ -32,6 +36,10 @@ export default function CategoryDetailPage() {
       if (res.ok) {
         const data = await res.json();
         setCategory(data);
+        setCurrentPage(1);
+        setSelectedQuestionId((currentId) => currentId && data.questions.some((question: any) => question.id === currentId)
+          ? currentId
+          : data.questions[0]?.id || null);
       } else if (res.status === 404) {
         toast.error("Category not found");
         router.push("/categories");
@@ -88,6 +96,19 @@ export default function CategoryDetailPage() {
     );
   }
 
+  const selectedQuestion = category?.questions?.find(
+    (question: any) => question.id === selectedQuestionId
+  );
+  const questions = category?.questions || [];
+  const totalPages = Math.max(1, Math.ceil(questions.length / rowsPerPage));
+  const pageStart = (currentPage - 1) * rowsPerPage;
+  const visibleQuestions = questions.slice(pageStart, pageStart + rowsPerPage);
+
+  const handleRowsPerPageChange = (value: string) => {
+    setRowsPerPage(Number(value));
+    setCurrentPage(1);
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -128,25 +149,129 @@ export default function CategoryDetailPage() {
           </div>
         )}
 
-        <div className="space-y-4">
-          {category?.questions?.length > 0 ? (
-            category.questions.map((question: any, index: any) => (
+        <div className="question-workspace">
+          <section className="question-list-panel" aria-label="Questions">
+             {questions.length > 0 && (
+            <div className="panel-heading">
+              <div>
+                <p className="panel-eyebrow">Study queue ({questions.length})</p>
+                <h2>Questions</h2>
+              </div>
+              <div className="pagination-controls">
+                <label htmlFor="rows-per-page">Rows</label>
+                <select
+                  id="rows-per-page"
+                  value={rowsPerPage}
+                  onChange={(event) => handleRowsPerPageChange(event.target.value)}
+                  className="rows-select"
+                >
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+                <button
+                  type="button"
+                  className="pagination-button"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Previous page"
+                >
+                  <FiChevronLeft />
+                </button>
+                <span className="page-number">{currentPage} / {totalPages}</span>
+                <button
+                  type="button"
+                  className="pagination-button"
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={currentPage === totalPages}
+                  aria-label="Next page"
+                >
+                  <FiChevronRight />
+                </button>
+              </div>
+            </div>
+          )}
+          {questions.length > 0 ? (
+            visibleQuestions.map((question: any, index: number) => (
               <QuestionAccordion
                 key={question.id}
                 question={question}
                 onEdit={handleQuestionEdit}
                 onDelete={handleQuestionDelete}
                 isAdmin={true}
-                index={index} // Pass the index h
+                index={pageStart + index}
+                isActive={question.id === selectedQuestionId}
+                onSelect={setSelectedQuestionId}
               />
             ))
           ) : (
-            <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
+            <div className="empty-questions">
               <p className="text-gray-500">
                 No questions found in this category. Create your first question!
               </p>
             </div>
           )}
+          {questions.length > 0 && (
+            <div className="question-pagination">
+              <span className="pagination-summary">
+                Showing {pageStart + 1}-{Math.min(pageStart + rowsPerPage, questions.length)} of {questions.length}
+              </span>
+              <div className="pagination-controls">
+                <label htmlFor="rows-per-page">Rows</label>
+                <select
+                  id="rows-per-page"
+                  value={rowsPerPage}
+                  onChange={(event) => handleRowsPerPageChange(event.target.value)}
+                  className="rows-select"
+                >
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+                <button
+                  type="button"
+                  className="pagination-button"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Previous page"
+                >
+                  <FiChevronLeft />
+                </button>
+                <span className="page-number">{currentPage} / {totalPages}</span>
+                <button
+                  type="button"
+                  className="pagination-button"
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={currentPage === totalPages}
+                  aria-label="Next page"
+                >
+                  <FiChevronRight />
+                </button>
+              </div>
+            </div>
+          )}
+          </section>
+
+          <section className="answer-panel" aria-live="polite">
+            {selectedQuestion ? (
+              <>
+                <div className="answer-heading">
+                  <div>
+                    <p className="panel-eyebrow">Selected answer</p>
+                    <h2>{selectedQuestion.title}</h2>
+                  </div>
+                  <span className="answer-index">
+                    {String(category.questions.indexOf(selectedQuestion) + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <AnswerContent answer={selectedQuestion.answer} />
+              </>
+            ) : (
+              <div className="answer-empty">
+                <p>Select a question to view its answer.</p>
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </Layout>

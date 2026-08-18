@@ -42,11 +42,11 @@ export default function Layout({ children }: any) {
   }
 
   return (
-    <>
+    <div className="app-shell">
       <Navigation categories={categories} />
-      <main className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="app-main">
         {children}
       </main>
-    </>
+    </div>
   );
 }

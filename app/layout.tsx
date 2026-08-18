@@ -1,9 +1,17 @@
-import { Inter } from "next/font/google";
+import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Provider from './Provider';
 
-const inter = Inter({ subsets: ["latin"] });
+const bodyFont = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
+
+const displayFont = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
 
 export const metadata = {
   title: "Interview Management System",
@@ -13,7 +21,7 @@ export const metadata = {
 export default function RootLayout({ children }: any) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${bodyFont.variable} ${displayFont.variable}`}>
         <Provider>
         <div className="min-h-screen">
           {children}
