@@ -18,7 +18,7 @@
     "dotenv": "16.4.7",
     "@uiw/react-codemirror": "^4.23.9",
     "autoprefixer": "^10.4.16",
-    "next": "15.2.0",
+    "next": "15.2.8",
     "next-auth": "^4.24.5",
     "postcss": "^8.4.32",
     "prisma": "^5.7.0",
