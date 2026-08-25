@@ -87,7 +87,9 @@ h1, h2, h3 { font-family: var(--font-display), sans-serif; letter-spacing: -0.02
 .answer-heading { align-items: center; padding: 1.5rem 1.75rem; }
 .answer-heading h2 { max-width: 52rem; font-size: clamp(1.15rem, 1.8vw, 1.55rem); }
 .answer-copy { overflow-y: auto; flex: 1; padding: 1.75rem; color: #465954; font-size: 0.92rem; line-height: 1.8; }
-.answer-paragraph { margin: 0 0 1rem; white-space: pre-wrap; }
+.answer-paragraph { margin: 0 0 1rem; }
+.answer-subheading { margin: 0.7rem 0 0.2rem; line-height: 1.35; font-weight: 600;    font-size: x-large; color: var(--teal)}
+.answer-subheading:first-child { margin-top: 0; }
 .inline-code { border: 1px solid #d6e7e2; border-radius: 0.35rem; background: #edf7f4; padding: 0.1rem 0.35rem; color: var(--teal-dark); font-family: var(--font-mono), monospace; font-size: 0.82em; }
 .answer-empty, .empty-questions { display: grid; min-height: 12rem; place-items: center; padding: 2rem; color: var(--ink-muted); text-align: center; }
 .answer-empty { flex: 1; }

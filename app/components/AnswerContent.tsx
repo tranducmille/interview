@@ -1,6 +1,25 @@
 "use client";
 
 import CodeBlock from "./CodeBlock";
+import { Fragment } from "react";
+
+function renderInlineContent(text: string) {
+  return text.split(/(`.+?`|\*\*.+?\*\*)/g).map((content, index) => {
+    if (content.startsWith("`") && content.endsWith("`")) {
+      return (
+        <code key={index} className="inline-code">
+          {content.slice(1, -1)}
+        </code>
+      );
+    }
+
+    if (content.startsWith("**") && content.endsWith("**")) {
+      return <strong key={index}>{content.slice(2, -2)}</strong>;
+    }
+
+    return content;
+  });
+}
 
 export default function AnswerContent({ answer = "" }: { answer?: string }) {
   const parts = answer.split(/(```[a-z]*\n[\s\S]*?\n```)/g);
@@ -20,20 +39,45 @@ export default function AnswerContent({ answer = "" }: { answer?: string }) {
           );
         }
 
+        const lines = part.split(/\r?\n/);
+
         return (
-          <p key={index} className="answer-paragraph">
-            {part.split(/(`.+?`)/g).map((text, textIndex) => {
-              if (text.startsWith("`") && text.endsWith("`")) {
+          <div key={index} className="answer-paragraph">
+            {lines.map((line, lineIndex) => {
+              const headingMatch = line.match(/^(---#|###|##|#)\s*(.*)$/);
+              const content = headingMatch ? headingMatch[2] : line;
+              const lineContent = renderInlineContent(content);
+
+              if (headingMatch?.[1] === "###") {
                 return (
-                  <code key={textIndex} className="inline-code">
-                    {text.slice(1, -1)}
-                  </code>
+                  <Fragment key={lineIndex}>
+                    <h3 className="answer-subheading">{lineContent}</h3>
+                    {lineIndex < lines.length - 1}
+                  </Fragment>
                 );
               }
 
-              return text;
+              if (
+                headingMatch?.[1] === "#" ||
+                headingMatch?.[1] === "##" ||
+                headingMatch?.[1] === "---#"
+              ) {
+                return (
+                  <Fragment key={lineIndex}>
+                    <h2 className="answer-subheading">{lineContent}</h2>
+                    {lineIndex < lines.length - 1}
+                  </Fragment>
+                );
+              }
+
+              return (
+                <Fragment key={lineIndex}>
+                  {lineContent}
+                  {lineIndex < lines.length - 1}
+                </Fragment>
+              );
             })}
-          </p>
+          </div>
         );
       })}
     </div>
