@@ -115,9 +115,10 @@ body {
 h1, h2, h3 { font-family: var(--font-display), sans-serif; letter-spacing: -0.025em; }
 .accordion { overflow: hidden; border: 1px solid var(--line); border-radius: 0.85rem; background: white; box-shadow: 0 4px 18px rgba(24, 37, 36, 0.04); }
 .accordion-content { border-top: 1px solid var(--line); background: #fbfcfc; }
-.question-workspace { display: grid; min-height: min(68vh, 720px); grid-template-columns: minmax(17rem, 0.78fr) minmax(0, 1.6fr); gap: 1rem; }
+.question-workspace { display: grid; min-height: min(68vh, 720px); grid-template-columns: minmax(0, 1.6fr) minmax(17rem, 0.78fr); gap: 1rem; }
 .question-list-panel, .answer-panel { overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: #fff; box-shadow: 0 10px 30px rgba(24, 37, 36, 0.05); }
-.question-list-panel { background: #f9fbfa; }
+.question-list-panel { order: 2; background: #f9fbfa; }
+.answer-panel { order: 1; }
 .panel-heading, .answer-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); padding: 1.25rem 1.35rem; }
 .panel-heading h2, .answer-heading h2 { margin-top: 0.2rem; color: var(--foreground); font-size: 1.08rem; font-weight: 700; line-height: 1.3; }
 .panel-eyebrow { color: var(--teal); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
