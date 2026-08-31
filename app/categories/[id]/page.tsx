@@ -20,7 +20,7 @@ export default function CategoryDetailPage() {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
   const [answerWindowState, setAnswerWindowState] = useState<"default" | "maximized" | "minimized">("default");
 
   useEffect(() => {
@@ -181,6 +181,7 @@ export default function CategoryDetailPage() {
                   className="rows-select"
                 >
                   <option value="10">10</option>
+                  <option value="15">15</option>
                   <option value="20">20</option>
                   <option value="50">50</option>
                 </select>
@@ -240,6 +241,7 @@ export default function CategoryDetailPage() {
                   className="rows-select"
                 >
                   <option value="10">10</option>
+                  <option value="15">15</option>
                   <option value="20">20</option>
                   <option value="50">50</option>
                 </select>
