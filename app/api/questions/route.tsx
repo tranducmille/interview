@@ -40,11 +40,10 @@ export async function POST(request: any) {
       );
     }
 
-    // Verify the category belongs to the user
+    // Any authenticated admin can add questions to a category
     const category = await prisma.category.findUnique({
       where: {
         id: categoryId,
-        userId: session.user.id,
       },
     });
 

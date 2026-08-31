@@ -8,7 +8,7 @@ import QuestionAccordion from "../../components/QuestionAccordion";
 import QuestionForm from "../../components/QuestionForm";
 import AnswerContent from "../../components/AnswerContent";
 import toast from "react-hot-toast";
-import { FiChevronLeft, FiChevronRight, FiPlus, FiX } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiMaximize2, FiMinimize2, FiMinus, FiPlus, FiX } from "react-icons/fi";
 
 export default function CategoryDetailPage() {
   const { data: session, status } = useSession();
@@ -21,6 +21,7 @@ export default function CategoryDetailPage() {
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [answerWindowState, setAnswerWindowState] = useState<"default" | "maximized" | "minimized">("default");
 
   useEffect(() => {
     if (status === "authenticated" && params.id) {
@@ -252,7 +253,10 @@ export default function CategoryDetailPage() {
           )}
           </section>
 
-          <section className="answer-panel" aria-live="polite">
+          <section
+            className={`answer-panel ${answerWindowState === "maximized" ? "is-maximized" : ""} ${answerWindowState === "minimized" ? "is-minimized" : ""}`}
+            aria-live="polite"
+          >
             {selectedQuestion ? (
               <>
                 <div className="answer-heading">
@@ -260,11 +264,46 @@ export default function CategoryDetailPage() {
                     <p className="panel-eyebrow">Selected answer</p>
                     <h2>{selectedQuestion.title}</h2>
                   </div>
-                  <span className="answer-index">
-                    {String(category.questions.indexOf(selectedQuestion) + 1).padStart(2, "0")}
-                  </span>
+                  <div className="answer-panel-actions">
+                    <div className="answer-window-actions">
+                      <button
+                        type="button"
+                        className="window-control"
+                        onClick={() =>
+                          setAnswerWindowState((current) =>
+                            current === "maximized" ? "default" : "maximized"
+                          )
+                        }
+                        aria-label={
+                          answerWindowState === "maximized"
+                            ? "Restore answer panel"
+                            : "Maximize answer panel"
+                        }
+                      >
+                        {answerWindowState === "maximized" ? <FiMinimize2 /> : <FiMaximize2 />}
+                      </button>
+                      <button
+                        type="button"
+                        className="window-control"
+                        onClick={() =>
+                          setAnswerWindowState((current) =>
+                            current === "minimized" ? "default" : "minimized"
+                          )
+                        }
+                        aria-label={
+                          answerWindowState === "minimized"
+                            ? "Restore answer panel"
+                            : "Minimize answer panel"
+                        }
+                      >
+                        <FiMinus />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <AnswerContent answer={selectedQuestion.answer} />
+                {answerWindowState !== "minimized" && (
+                  <AnswerContent answer={selectedQuestion.answer} />
+                )}
               </>
             ) : (
               <div className="answer-empty">

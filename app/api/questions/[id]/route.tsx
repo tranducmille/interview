@@ -37,14 +37,6 @@ export async function GET(request: any, { params }: any) {
       );
     }
 
-    // Check if the question belongs to a category owned by the user
-    if (question.category.userId !== session.user.id) {
-      return NextResponse.json(
-        { message: "Not authorized to access this question" },
-        { status: 403 }
-      );
-    }
-
     return NextResponse.json(question);
   } catch (error) {
     console.error("Error fetching question:", error);
@@ -106,19 +98,11 @@ export async function PUT(request: any, { params }: any) {
       );
     }
 
-    if (existingQuestion.category.userId !== session.user.id) {
-      return NextResponse.json(
-        { message: "Not authorized to update this question" },
-        { status: 403 }
-      );
-    }
-
-    // If categoryId is provided, verify it belongs to the user
+    // Any authenticated admin can move a question between categories
     if (categoryId && categoryId !== existingQuestion.categoryId) {
       const categoryExists = await prisma.category.findUnique({
         where: {
           id: categoryId,
-          userId: session.user.id,
         },
       });
 
@@ -183,13 +167,6 @@ export async function DELETE(request: any, { params }: any) {
       return NextResponse.json(
         { message: "Question not found" },
         { status: 404 }
-      );
-    }
-
-    if (existingQuestion.category.userId !== session.user.id) {
-      return NextResponse.json(
-        { message: "Not authorized to delete this question" },
-        { status: 403 }
       );
     }
 

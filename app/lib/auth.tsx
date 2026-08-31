@@ -17,6 +17,7 @@ export const authOptions = {
     session: async ({ session, user }: any) => {
       if (session?.user) {
         session.user.id = user.id;
+        session.user.role = "admin";
       }
       return session;
     },

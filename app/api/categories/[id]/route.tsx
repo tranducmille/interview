@@ -22,7 +22,6 @@ export async function GET(
     const category = await prisma.category.findUnique({
       where: {
         id,
-        userId: session.user.id,
       },
       include: {
         questions: {
