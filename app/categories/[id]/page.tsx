@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
 import QuestionAccordion from "../../components/QuestionAccordion";
 import QuestionForm from "../../components/QuestionForm";
 import AnswerContent from "../../components/AnswerContent";
 import toast from "react-hot-toast";
-import { FiChevronLeft, FiChevronRight, FiMaximize2, FiMinimize2, FiMinus, FiPlus, FiX } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiLogOut, FiMaximize2, FiMinimize2, FiMinus, FiPlus, FiX } from "react-icons/fi";
 
 export default function CategoryDetailPage() {
   const { data: session, status } = useSession();
@@ -113,27 +113,41 @@ export default function CategoryDetailPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <h1 className="text-xl font-bold text-gray-800">
             {category?.name || "Category"}
           </h1>
-          <button
-            onClick={() => {
-              setEditingQuestion(null);
-              setShowForm(!showForm);
-            }}
-            className="btn btn-primary btn-small flex items-center gap-1"
-          >
-            {showForm ? (
-              <>
-                <FiX /> Cancel
-              </>
-            ) : (
-              <>
-                <FiPlus /> Add Question
-              </>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setEditingQuestion(null);
+                setShowForm(!showForm);
+              }}
+              className="btn btn-primary btn-small flex items-center gap-1"
+            >
+              {showForm ? (
+                <>
+                  <FiX /> Cancel
+                </>
+              ) : (
+                <>
+                  <FiPlus /> Add Question
+                </>
+              )}
+            </button>
+
+            {session && (
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="btn btn-small flex items-center gap-2 border border-[#cfe2dd] bg-[#887a3d] text-[#ffffff] hover:border-[#b7d7d0] hover:bg-[#ebf7f4]"
+              >
+                <FiLogOut />
+                <span>Logout</span>
+              </button>
             )}
-          </button>
+          </div>
         </div>
 
         {showForm && (

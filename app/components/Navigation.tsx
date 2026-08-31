@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { FiBookOpen, FiChevronDown, FiChevronUp, FiFolder, FiGrid } from "react-icons/fi";
+import { FiBookOpen, FiChevronDown, FiFolder, FiGrid, FiChevronUp } from "react-icons/fi";
 import { useState } from "react";
 
 export default function Navigation({ categories = [] }: any) {
@@ -65,6 +65,7 @@ export default function Navigation({ categories = [] }: any) {
           )}
         </div>
       </div>
+
     </aside>
   );
 }
