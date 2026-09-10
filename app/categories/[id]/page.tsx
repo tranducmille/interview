@@ -167,7 +167,7 @@ export default function CategoryDetailPage() {
       })
       .catch((error) => {
         console.error("Error saving question progress:", error);
-        toast.error("Unable to save question progress");
+        toast.error(error instanceof Error ? error.message : "Unable to save question progress");
       });
   };
 
