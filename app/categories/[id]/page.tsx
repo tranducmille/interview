@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
@@ -8,7 +8,7 @@ import QuestionAccordion from "../../components/QuestionAccordion";
 import QuestionForm from "../../components/QuestionForm";
 import AnswerContent from "../../components/AnswerContent";
 import toast from "react-hot-toast";
-import { FiChevronLeft, FiChevronRight, FiLogOut, FiMaximize2, FiMinimize2, FiMinus, FiPlus, FiX } from "react-icons/fi";
+import { FiCheck, FiCheckCircle, FiChevronLeft, FiChevronRight, FiLogOut, FiMaximize2, FiMinimize2, FiMinus, FiPlus, FiX } from "react-icons/fi";
 
 export default function CategoryDetailPage() {
   const { data: session, status } = useSession();
@@ -22,6 +22,8 @@ export default function CategoryDetailPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(15);
   const [answerWindowState, setAnswerWindowState] = useState<"default" | "maximized" | "minimized">("default");
+  const [completedQuestionIds, setCompletedQuestionIds] = useState<string[]>([]);
+  const progressSaveQueue = useRef(Promise.resolve());
 
   useEffect(() => {
     if (status === "authenticated" && params.id) {
@@ -32,15 +34,31 @@ export default function CategoryDetailPage() {
   const fetchCategory = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/categories/${params.id}`);
+      const [res, progressRes] = await Promise.all([
+        fetch(`/api/categories/${params.id}`),
+        fetch(`/api/categories/${params.id}/progress`),
+      ]);
       
       if (res.ok) {
         const data = await res.json();
+        const progress = progressRes.ok ? await progressRes.json() : null;
         setCategory(data);
-        setCurrentPage(1);
-        setSelectedQuestionId((currentId) => currentId && data.questions.some((question: any) => question.id === currentId)
-          ? currentId
-          : data.questions[0]?.id || null);
+        setCompletedQuestionIds(progress?.completedQuestionIds || []);
+        const savedQuestionId = progress?.currentQuestionId;
+        const hasSavedQuestion = savedQuestionId && data.questions.some((question: any) => question.id === savedQuestionId);
+        const hasCurrentQuestion = selectedQuestionId && data.questions.some((question: any) => question.id === selectedQuestionId);
+        const nextQuestionId = hasSavedQuestion
+          ? savedQuestionId
+          : hasCurrentQuestion
+            ? selectedQuestionId
+            : data.questions[0]?.id || null;
+
+        setSelectedQuestionId(nextQuestionId);
+
+        const selectedIndex = data.questions.findIndex((question: any) => question.id === nextQuestionId);
+        const questionPage = selectedIndex >= 0 ? Math.floor(selectedIndex / rowsPerPage) + 1 : 1;
+        const latestPage = Math.max(1, Math.ceil(data.questions.length / rowsPerPage));
+        setCurrentPage(Math.min(questionPage, latestPage));
       } else if (res.status === 404) {
         toast.error("Category not found");
         router.push("/categories");
@@ -110,6 +128,52 @@ export default function CategoryDetailPage() {
     setCurrentPage(1);
   };
 
+  const toggleQuestionCompletion = (questionId: string) => {
+    setCompletedQuestionIds((currentIds) => {
+      const nextIds = currentIds.includes(questionId)
+        ? currentIds.filter((id) => id !== questionId)
+        : [...currentIds, questionId];
+
+      saveProgress(nextIds, selectedQuestionId);
+      return nextIds;
+    });
+  };
+
+  const setAllQuestionsCompleted = (completed: boolean) => {
+    const nextIds = completed ? questions.map((question: any) => question.id) : [];
+    setCompletedQuestionIds(nextIds);
+    saveProgress(nextIds, selectedQuestionId);
+  };
+
+  const selectQuestion = (questionId: string) => {
+    setSelectedQuestionId(questionId);
+    saveProgress(completedQuestionIds, questionId);
+  };
+
+  const saveProgress = (completedQuestionIds: string[], currentQuestionId: string | null) => {
+    progressSaveQueue.current = progressSaveQueue.current
+      .catch(() => undefined)
+      .then(async () => {
+        const response = await fetch(`/api/categories/${params.id}/progress`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ completedQuestionIds, currentQuestionId }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(`${response.status}: ${error.message || "Unable to save question progress"}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Error saving question progress:", error);
+        toast.error("Unable to save question progress");
+      });
+  };
+
+  const completedCount = questions.filter((question: any) => completedQuestionIds.includes(question.id)).length;
+  const progressPercent = questions.length ? Math.round((completedCount / questions.length) * 100) : 0;
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -171,39 +235,21 @@ export default function CategoryDetailPage() {
               <div>
                 <p className="panel-eyebrow">Study queue ({questions.length})</p>
                 <h2>Questions</h2>
-              </div>
-              <div className="pagination-controls">
-                <label htmlFor="rows-per-page">Rows</label>
-                <select
-                  id="rows-per-page"
-                  value={rowsPerPage}
-                  onChange={(event) => handleRowsPerPageChange(event.target.value)}
-                  className="rows-select"
-                >
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-                <button
-                  type="button"
-                  className="pagination-button"
-                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-                  disabled={currentPage === 1}
-                  aria-label="Previous page"
-                >
-                  <FiChevronLeft />
-                </button>
-                <span className="page-number">{currentPage} / {totalPages}</span>
-                <button
-                  type="button"
-                  className="pagination-button"
-                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
-                  disabled={currentPage === totalPages}
-                  aria-label="Next page"
-                >
-                  <FiChevronRight />
-                </button>
+                <div className="progress-summary" aria-label={`${completedCount} of ${questions.length} questions completed`}>
+                  <span>{completedCount}/{questions.length} completed</span>
+                  <span className="progress-track" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100} aria-label={`${progressPercent}% complete`}>
+                    <span className="progress-value" style={{ width: `${progressPercent}%` }} />
+                    <span className="progress-label">{progressPercent}%</span>
+                  </span>
+                  <div className="progress-actions">
+                    <button type="button" onClick={() => setAllQuestionsCompleted(true)}>
+                      Mark all
+                    </button>
+                    <button type="button" onClick={() => setAllQuestionsCompleted(false)}>
+                      Unmark all
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -217,7 +263,9 @@ export default function CategoryDetailPage() {
                 isAdmin={true}
                 index={pageStart + index}
                 isActive={question.id === selectedQuestionId}
-                onSelect={setSelectedQuestionId}
+                isCompleted={completedQuestionIds.includes(question.id)}
+                onSelect={selectQuestion}
+                onToggleComplete={toggleQuestionCompletion}
               />
             ))
           ) : (
@@ -233,9 +281,9 @@ export default function CategoryDetailPage() {
                 Showing {pageStart + 1}-{Math.min(pageStart + rowsPerPage, questions.length)} of {questions.length}
               </span>
               <div className="pagination-controls">
-                <label htmlFor="rows-per-page">Rows</label>
+                <label htmlFor="rows-per-page-bottom">Rows</label>
                 <select
-                  id="rows-per-page"
+                  id="rows-per-page-bottom"
                   value={rowsPerPage}
                   onChange={(event) => handleRowsPerPageChange(event.target.value)}
                   className="rows-select"
@@ -281,6 +329,15 @@ export default function CategoryDetailPage() {
                     <h2>{selectedQuestion.title}</h2>
                   </div>
                   <div className="answer-panel-actions">
+                    <button
+                      type="button"
+                      className={`completion-control ${completedQuestionIds.includes(selectedQuestion.id) ? "completed" : ""}`}
+                      onClick={() => toggleQuestionCompletion(selectedQuestion.id)}
+                      aria-pressed={completedQuestionIds.includes(selectedQuestion.id)}
+                    >
+                      {completedQuestionIds.includes(selectedQuestion.id) ? <FiCheckCircle /> : <FiCheck />}
+                      <span>{completedQuestionIds.includes(selectedQuestion.id) ? "Completed" : "Mark complete"}</span>
+                    </button>
                     <div className="answer-window-actions">
                       <button
                         type="button"
