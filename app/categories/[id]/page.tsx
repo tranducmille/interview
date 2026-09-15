@@ -150,6 +150,19 @@ export default function CategoryDetailPage() {
     saveProgress(completedQuestionIds, questionId);
   };
 
+  const navigateQuestion = (direction: -1 | 1) => {
+    if (!selectedQuestionId) return;
+
+    const selectedIndex = questions.findIndex((question: any) => question.id === selectedQuestionId);
+    const nextIndex = selectedIndex + direction;
+    const nextQuestion = questions[nextIndex];
+
+    if (!nextQuestion) return;
+
+    selectQuestion(nextQuestion.id);
+    setCurrentPage(Math.floor(nextIndex / rowsPerPage) + 1);
+  };
+
   const saveProgress = (completedQuestionIds: string[], currentQuestionId: string | null) => {
     progressSaveQueue.current = progressSaveQueue.current
       .catch(() => undefined)
@@ -329,6 +342,28 @@ export default function CategoryDetailPage() {
                     <h2>{selectedQuestion.title}</h2>
                   </div>
                   <div className="answer-panel-actions">
+                    <div className="answer-question-navigation" aria-label="Question navigation">
+                      <button
+                        type="button"
+                        className="window-control"
+                        onClick={() => navigateQuestion(-1)}
+                        disabled={questions.findIndex((question: any) => question.id === selectedQuestion.id) === 0}
+                        aria-label="Previous question"
+                        title="Previous question"
+                      >
+                        <FiChevronLeft />
+                      </button>
+                      <button
+                        type="button"
+                        className="window-control"
+                        onClick={() => navigateQuestion(1)}
+                        disabled={questions.findIndex((question: any) => question.id === selectedQuestion.id) === questions.length - 1}
+                        aria-label="Next question"
+                        title="Next question"
+                      >
+                        <FiChevronRight />
+                      </button>
+                    </div>
                     <button
                       type="button"
                       className={`completion-control ${completedQuestionIds.includes(selectedQuestion.id) ? "completed" : ""}`}
