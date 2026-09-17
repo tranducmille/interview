@@ -21,6 +21,19 @@ function renderInlineContent(text: string) {
   });
 }
 
+function parseTableRow(line: string) {
+  if (!line.includes("|")) {
+    return null;
+  }
+
+  const cells = line.trim().replace(/^\||\|$/g, "").split("|");
+  return cells.map((cell) => cell.trim());
+}
+
+function isTableSeparator(cells: string[]) {
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
 export default function AnswerContent({ answer = "" }: { answer?: string }) {
   const parts = answer.split(/(```[a-z]*\n[\s\S]*?\n```)/g);
 
@@ -40,13 +53,104 @@ export default function AnswerContent({ answer = "" }: { answer?: string }) {
         }
 
         const lines = part.split(/\r?\n/);
+        const tableStarts = new Map<number, { end: number; headers: string[]; rows: string[][] }>();
+        const tableLines = new Set<number>();
+
+        for (let lineIndex = 0; lineIndex < lines.length - 1; lineIndex += 1) {
+          const headers = parseTableRow(lines[lineIndex]);
+          const separator = parseTableRow(lines[lineIndex + 1]);
+
+          if (!headers || !separator || !isTableSeparator(separator)) {
+            continue;
+          }
+
+          const rows: string[][] = [];
+          let end = lineIndex + 2;
+
+          while (end < lines.length) {
+            const row = parseTableRow(lines[end]);
+            if (!row) {
+              break;
+            }
+
+            rows.push(row);
+            end += 1;
+          }
+
+          tableStarts.set(lineIndex, { end, headers, rows });
+          for (let tableLine = lineIndex; tableLine < end; tableLine += 1) {
+            tableLines.add(tableLine);
+          }
+
+          lineIndex = end - 1;
+        }
 
         return (
           <div key={index} className="answer-paragraph">
             {lines.map((line, lineIndex) => {
+              const table = tableStarts.get(lineIndex);
+              if (table) {
+                return (
+                  <div key={lineIndex} className="answer-table-wrap">
+                    <table className="answer-table">
+                      <thead>
+                        <tr>
+                          {table.headers.map((header, cellIndex) => (
+                            <th key={cellIndex}>{renderInlineContent(header)}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {table.rows.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {table.headers.map((_, cellIndex) => (
+                              <td key={cellIndex}>
+                                {renderInlineContent(row[cellIndex] || "")}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              }
+
+              if (tableLines.has(lineIndex)) {
+                return null;
+              }
+
+              const questionMatch = line.match(/^\*\*(.+?)\*\*\s*$/);
               const headingMatch = line.match(/^(---#|###|##|#)\s*(.*)$/);
-              const content = headingMatch ? headingMatch[2] : line;
+              const quoteMatch = line.match(/^[<>]\s?(.*)$/);
+              const content = questionMatch
+                ? questionMatch[1]
+                : headingMatch
+                  ? headingMatch[2]
+                  : quoteMatch
+                    ? quoteMatch[1]
+                    : line;
               const lineContent = renderInlineContent(content);
+
+              if (questionMatch) {
+                return (
+                  <h2 key={lineIndex} className="answer-subheading answer-question">
+                    {lineContent}
+                  </h2>
+                );
+              }
+
+              if (quoteMatch) {
+                if (!quoteMatch[1].trim()) {
+                  return null;
+                }
+
+                return (
+                  <blockquote key={lineIndex} className="answer-quote">
+                    {lineContent}
+                  </blockquote>
+                );
+              }
 
               if (headingMatch?.[1] === "###") {
                 return (
@@ -71,10 +175,9 @@ export default function AnswerContent({ answer = "" }: { answer?: string }) {
               }
 
               return (
-                <Fragment key={lineIndex}>
+                <span key={lineIndex} className="answer-line">
                   {lineContent}
-                  {lineIndex < lines.length - 1}
-                </Fragment>
+                </span>
               );
             })}
           </div>

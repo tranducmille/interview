@@ -180,6 +180,14 @@ h1, h2, h3 { font-family: var(--font-display), sans-serif; letter-spacing: -0.02
 .answer-paragraph { margin: 0 0 1rem; }
 .answer-subheading { margin: 0.7rem 0 0.2rem; line-height: 1.35; font-weight: 600;    font-size: x-large; color: var(--teal)}
 .answer-subheading:first-child { margin-top: 0; }
+.answer-question { margin-top: 0.45rem; margin-bottom: 0.25rem; font-size: 1.15rem; }
+.answer-quote { margin: 0.15rem 0; border-left: 3px solid #8abdb2; background: #f1f8f6; padding: 0.3rem 0.75rem; color: #55706a; font-style: italic; }
+.answer-line { display: block; }
+.answer-table-wrap { margin: 0.65rem 0; overflow-x: auto; }
+.answer-table { width: 100%; min-width: 38rem; border: 1px solid #b9d0ca; border-collapse: separate; border-spacing: 0; border-radius: 0.4rem; color: #465954; font-size: 0.86rem; line-height: 1.5; overflow: hidden; }
+.answer-table th, .answer-table td { border: 1px solid #d6e7e2; padding: 0.55rem 0.7rem; text-align: left; vertical-align: top; }
+.answer-table th { background: #e8f4f1; color: var(--teal-dark); font-weight: 750; }
+.answer-table tbody tr:nth-child(even) { background: #f7fbfa; }
 .inline-code { border: 1px solid #d6e7e2; border-radius: 0.35rem; background: #edf7f4; padding: 0.1rem 0.35rem; color: var(--teal-dark); font-family: var(--font-mono), monospace; font-size: 0.82em; }
 .answer-empty, .empty-questions { display: grid; min-height: 12rem; place-items: center; padding: 2rem; color: var(--ink-muted); text-align: center; }
 .answer-empty { flex: 1; }
